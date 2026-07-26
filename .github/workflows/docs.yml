@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "src/pyicc/**"
+      - "src/pyiccprofile/**"
       - "pyproject.toml"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
           pip install pdoc
 
       - name: Build API docs
-        run: pdoc --docformat google --output-directory site src/pyicc
+        run: pdoc --docformat google --output-directory site src/pyiccprofile
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

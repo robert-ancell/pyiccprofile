@@ -1,4 +1,4 @@
-from pyicc.icc_profile import (
+from pyiccprofile.icc_profile import (
     ICCDataColorSpace,
     ICCDateTime,
     ICCProfile,
