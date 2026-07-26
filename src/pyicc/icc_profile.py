@@ -5,7 +5,7 @@ _DEFAULT_VERSION = (4, 4, 0)
 _NULL_SIGNATURE = b"\x00\x00\x00\x00"
 
 _NULL_ID = (
-    b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
 )
 
 
@@ -289,8 +289,8 @@ class ICCProfile:
             raise ValueError("device_model must be 4 bytes")
         if len(creator) != 4:
             raise ValueError("creator must be 4 bytes")
-        if len(id) != 12:
-            raise ValueError("id must be 12 bytes")
+        if len(id) != 16:
+            raise ValueError("id must be 16 bytes")
         self.preferred_cmm_type = preferred_cmm_type
         self.version = version
         self.profile_class = profile_class
@@ -391,11 +391,14 @@ class ICCProfile:
             tagged_elements=tagged_elements,
         )
 
-    def encode(self, data: bytearray) -> None:
-        _append_uint32(data, 128)
+    def encode(self) -> bytes:
+        data = bytearray()
+        _append_uint32(data, 132) # FIXME: profile size
         _append_uint32(data, self.preferred_cmm_type)
         data.append(self.version[0])
         data.append(self.version[1] << 4 | self.version[2])
+        data.append(0)
+        data.append(0)
         data.extend(self.profile_class)
         data.extend(self.data_color_space)
         data.extend(self.pcs)
@@ -407,11 +410,16 @@ class ICCProfile:
         data.extend(self.device_model)
         _append_uint64(data, self.device_attributes)
         _append_uint32(data, self.rendering_intent)
+        # FIXME nCIEXYZ values
+        for _ in range(12):
+            data.append(0)
         data.extend(self.creator)
         data.extend(self.id)
         for _ in range(28):
             data.append(0)
         # FIXME: tags
+        _append_uint32(data, 0)
+        return bytes(data)
 
     def __repr__(self) -> str:
         rendering_intent_str = {

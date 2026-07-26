@@ -1,3 +1,9 @@
-from pyicc.icc_profile import ICCProfile, ICCProfileDescription
+from pyicc.icc_profile import (
+    ICCDataColorSpace,
+    ICCDateTime,
+    ICCProfile,
+    ICCProfileClass,
+    ICCProfileDescription,
+)
 
-__all__ = ["ICCProfile", "ICCProfileDescription"]
+__all__ = ["ICCDataColorSpace", "ICCDateTime", "ICCProfile", "ICCProfileClass", "ICCProfileDescription"]
