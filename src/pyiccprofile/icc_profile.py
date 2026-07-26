@@ -48,12 +48,10 @@ def _decode_s15fixed16_array(data: bytes) -> list[float]:
         raise ValueError("Reserved field must be 0")
     offset = 8
     count = (len(data) - offset) // 4
-    if count % 3 != 0:
-        raise ValueError("Invalid count")
     values = []
-    for _ in range(0, count, 3):
-        values.append(_get_xyz_number(data, offset))
-        offset += 12
+    for _ in range(count):
+        values.append(_get_s15fixed16_number(data, offset))
+        offset += 4
     return values
 
 def _decode_xyz(data: bytes) -> list[tuple[float, float, float]]:
@@ -67,10 +65,12 @@ def _decode_xyz(data: bytes) -> list[tuple[float, float, float]]:
         raise ValueError("Reserved field must be 0")
     offset = 8
     count = (len(data) - offset) // 4
+    if count % 3 != 0:
+        raise ValueError("Invalid count")
     values = []
-    for _ in range(count):
+    for _ in range(0, count, 3):
         values.append(_get_xyz_number(data, offset))
-        offset += 4
+        offset += 12
     return values
 
 
@@ -90,6 +90,12 @@ def _append_xyz_number(data: bytearray, value: tuple[float, float, float]) -> No
     _append_s15fixed16_number(data, value[0])
     _append_s15fixed16_number(data, value[1])
     _append_s15fixed16_number(data, value[2])
+
+def _encode_s15fixed16_array(data: bytearray, values: list[float]) -> None:
+    data.extend(b"sf32")
+    data.extend(b"\x00\x00\x00\x00")
+    for value in values:
+        _append_s15fixed16_number(data, value)
 
 def _encode_xyz(data: bytearray, values: list[tuple[float, float, float]]) -> None:
     data.extend(b"XYZ ")
@@ -283,19 +289,21 @@ class ICCCopyright(ICCTaggedElement):
 
 
 class ICCChromaticAdaptation(ICCTaggedElement):
-    def __init__(self):
-        pass
+    def __init__(self, matrix: list[float]):
+        self.matrix = matrix
 
     @classmethod
     def decode(cls, data: bytes) -> "ICCChromaticAdaptation":
-        # FIXME
-        return cls()
+        matrix = _decode_s15fixed16_array(data)
+        if len(matrix) != 9:
+            raise ValueError("Invalid matrix")
+        return cls(matrix)
 
     def encode(self, data: bytearray) -> None:
-        pass
+        _encode_s15fixed16_array(data, self.matrix)
 
     def __repr__(self) -> str:
-        return "ICCChromaticAdaptation()"
+        return f"ICCChromaticAdaptation({self.matrix})"
 
 
 class ICCMediaWhitePoint(ICCTaggedElement):
@@ -305,6 +313,7 @@ class ICCMediaWhitePoint(ICCTaggedElement):
     @classmethod
     def decode(cls, data: bytes) -> "ICCMediaWhitePoint":
         colors = _decode_xyz(data)
+        # FIXME: Can this be more than one color?
         return cls(colors)
 
     def encode(self, data: bytearray) -> None:
