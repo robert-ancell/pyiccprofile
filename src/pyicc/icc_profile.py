@@ -358,7 +358,7 @@ class ICCProfile:
             length = _get_uint32(data, tag_start + 8)
             if offset < data_start or offset + length > len(data):
                 raise ValueError("ICC profile tag data is out of bounds")
-            tag_class = {
+            tag_class: type[ICCTaggedElement]|None = {
                 b"desc": ICCProfileDescription,
                 b"cprt": ICCCopyright,
                 b"chad": ICCChromaticAdaptation,
