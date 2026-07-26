@@ -20,9 +20,59 @@ def _get_uint32(data: bytes, offset: int) -> int:
 def _get_uint64(data: bytes, offset: int) -> int:
     return int.from_bytes(data[offset : offset + 8], byteorder="big")
 
+def _get_s15fixed16_number(data: bytes, offset: int) -> float:
+    v = int.from_bytes(data[offset : offset + 4], byteorder="big", signed=True)
+    return v / 65536.0
+
+def _get_u15fixed16_number(data: bytes, offset: int) -> float:
+    return _get_uint32(data, offset) / 65536.0
+
+def _get_xyz_number(data: bytes, offset: int) -> tuple[float, float, float]:
+    return (
+        _get_s15fixed16_number(data, offset),
+        _get_s15fixed16_number(data, offset + 4),
+        _get_s15fixed16_number(data, offset + 8),
+    )
 
 def _get_signature(data: bytes, offset: int) -> bytes:
     return data[offset : offset + 4]
+
+def _decode_s15fixed16_array(data: bytes) -> list[float]:
+    if len(data) < 8 or len(data) % 4 != 0:
+        raise ValueError("Invalid length")
+    signature = _get_signature(data, 0)
+    if signature != b"sf32":
+        raise ValueError("Invalid signature")
+    reserved = data[4:8]
+    if reserved != b"\x00\x00\x00\x00":
+        raise ValueError("Reserved field must be 0")
+    offset = 8
+    count = (len(data) - offset) // 4
+    if count % 3 != 0:
+        raise ValueError("Invalid count")
+    values = []
+    for _ in range(0, count, 3):
+        values.append(_get_xyz_number(data, offset))
+        offset += 12
+    return values
+
+def _decode_xyz(data: bytes) -> list[tuple[float, float, float]]:
+    if len(data) < 8 or len(data) % 4 != 0:
+        raise ValueError("Invalid length")
+    signature = _get_signature(data, 0)
+    if signature != b"XYZ ":
+        raise ValueError("Invalid signature")
+    reserved = data[4:8]
+    if reserved != b"\x00\x00\x00\x00":
+        raise ValueError("Reserved field must be 0")
+    offset = 8
+    count = (len(data) - offset) // 4
+    values = []
+    for _ in range(count):
+        values.append(_get_xyz_number(data, offset))
+        offset += 4
+    return values
+
 
 
 def _append_uint32(data: bytearray, value: int) -> None:
@@ -31,6 +81,21 @@ def _append_uint32(data: bytearray, value: int) -> None:
 
 def _append_uint64(data: bytearray, value: int) -> None:
     data.extend(value.to_bytes(8, byteorder="big"))
+
+def _append_s15fixed16_number(data: bytearray, value: float) -> None:
+    int_value = int(value * 65535)
+    data.extend(int_value.to_bytes(4, byteorder="big"))
+
+def _append_xyz_number(data: bytearray, value: tuple[float, float, float]) -> None:
+    _append_s15fixed16_number(data, value[0])
+    _append_s15fixed16_number(data, value[1])
+    _append_s15fixed16_number(data, value[2])
+
+def _encode_xyz(data: bytearray, values: list[tuple[float, float, float]]) -> None:
+    data.extend(b"XYZ ")
+    data.extend(b"\x00\x00\x00\x00")
+    for value in values:
+        _append_xyz_number(data, value)
 
 
 class ICCMultiLocalizedUnicodeTypeRecord:
@@ -234,19 +299,19 @@ class ICCChromaticAdaptation(ICCTaggedElement):
 
 
 class ICCMediaWhitePoint(ICCTaggedElement):
-    def __init__(self):
-        pass
+    def __init__(self, colors: list[tuple[float, float, float]]):
+        self.colors = colors
 
     @classmethod
     def decode(cls, data: bytes) -> "ICCMediaWhitePoint":
-        # FIXME
-        return cls()
+        colors = _decode_xyz(data)
+        return cls(colors)
 
     def encode(self, data: bytearray) -> None:
-        pass
+        _encode_xyz(data, self.colors)
 
     def __repr__(self) -> str:
-        return "ICCMediaWhitePoint()"
+        return f"ICCMediaWhitePoint({self.colors})"
 
 
 class ICCUnknownTaggedElement(ICCTaggedElement):
