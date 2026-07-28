@@ -78,6 +78,13 @@ class ICCRenderingIntent:
     ICC_ABSOLUTE_COLORMETRIC = 3
 
 
+class ICCPrimaryPlatform:
+    APPLE_COMPUTER_INC = b"APPL"
+    MICROSOFT_CORPORATION = b"MSFT"
+    SILICON_GRAPHICS_INC = b"SGI "
+    SUN_MICROSYSTEMS = b"SUNW"
+
+
 class ICCProfile:
     def __init__(
         self,
@@ -310,7 +317,17 @@ class ICCProfile:
         if self.flags != 0:
             args.append(f"flags={self.flags}")
         if self.primary_platform != _NULL_SIGNATURE:
-            args.append(f"primary_platform={self.primary_platform}")
+            primary_platform_str = {
+                ICCPrimaryPlatform.APPLE_COMPUTER_INC: "APPLE_COMPUTER_INC",
+                ICCPrimaryPlatform.MICROSOFT_CORPORATION: "MICROSOFT_CORPORATION",
+                ICCPrimaryPlatform.SILICON_GRAPHICS_INC: "SILICON_GRAPHICS_INC",
+                ICCPrimaryPlatform.SUN_MICROSYSTEMS: "SUN_MICROSYSTEMS",
+            }.get(self.primary_platform, None)
+            if primary_platform_str is None:
+                primary_platform_str = repr(self.primary_platform)
+            else:
+                primary_platform_str = f"ICCPrimaryPlatform.{primary_platform_str}"
+            args.append(f"primary_platform={primary_platform_str}")
         if self.device_manufacturer != _NULL_SIGNATURE:
             args.append(f"device_manufacturer={self.device_manufacturer!r}")
         if self.device_model != _NULL_SIGNATURE:
