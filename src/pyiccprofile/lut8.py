@@ -44,7 +44,8 @@ class ICCLut8:
         for table in input_tables:
             if len(table) != _TABLE_ENTRIES:
                 raise ValueError(f"Input table must have {_TABLE_ENTRIES} entries")
-        _get_n_clut_grid_points(input_tables, clut)
+        if _get_n_clut_grid_points(input_tables, clut) > 255:
+            raise ValueError("Too many CLUT grid points")
         for entry in clut:
             if len(entry) != len(output_tables):
                 raise ValueError("CLUT entry must have n_output_channels values")
