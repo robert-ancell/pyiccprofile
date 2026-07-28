@@ -1,3 +1,7 @@
+def encode_uint16(data: bytearray, value: int) -> None:
+    data.extend(value.to_bytes(2, byteorder="big"))
+
+
 def encode_uint32(data: bytearray, value: int) -> None:
     data.extend(value.to_bytes(4, byteorder="big"))
 
