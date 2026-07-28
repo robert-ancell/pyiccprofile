@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pyiccprofile.copyright import ICCCopyright
 from pyiccprofile.decoder import (
     decode_s15fixed16_array,
     decode_s15fixed16_number,
@@ -11,6 +12,7 @@ from pyiccprofile.decoder import (
     decode_uint64,
     decode_xyz,
 )
+from pyiccprofile.element import ICCTaggedElement
 from pyiccprofile.encoder import (
     encode_s15fixed16_array,
     encode_s15fixed16_number,
@@ -18,7 +20,7 @@ from pyiccprofile.encoder import (
     encode_uint64,
     encode_xyz,
 )
-from pyiccprofile.multi_localized_unicode_type import ICCMultiLocalizedUnicodeType
+from pyiccprofile.profile_description import ICCProfileDescription
 
 _DEFAULT_VERSION = (4, 4, 0)
 
@@ -262,44 +264,6 @@ class ICCDateTime:
 
     def __repr__(self) -> str:
         return f"ICCDateTime({self.year}, {self.month}, {self.day}, {self.hours}, {self.minutes}, {self.seconds})"
-
-
-class ICCTaggedElement:
-    @classmethod
-    def decode(cls, data: bytes) -> ICCTaggedElement:
-        raise NotImplementedError()
-
-
-class ICCProfileDescription(ICCTaggedElement):
-    def __init__(self, description: ICCMultiLocalizedUnicodeType):
-        self.description = description
-
-    @classmethod
-    def decode(cls, data: bytes) -> ICCProfileDescription:
-        description = ICCMultiLocalizedUnicodeType.decode(data)
-        return cls(description)
-
-    def encode(self, data: bytearray) -> None:
-        self.description.encode(data)
-
-    def __repr__(self) -> str:
-        return f"ICCProfileDescription({self.description})"
-
-
-class ICCCopyright(ICCTaggedElement):
-    def __init__(self, copyright: ICCMultiLocalizedUnicodeType):
-        self.copyright = copyright
-
-    @classmethod
-    def decode(cls, data: bytes) -> ICCCopyright:
-        copyright = ICCMultiLocalizedUnicodeType.decode(data)
-        return cls(copyright)
-
-    def encode(self, data: bytearray) -> None:
-        self.copyright.encode(data)
-
-    def __repr__(self) -> str:
-        return f"ICCCopyright({self.copyright})"
 
 
 class ICCChromaticAdaptation(ICCTaggedElement):
