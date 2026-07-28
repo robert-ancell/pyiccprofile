@@ -171,5 +171,8 @@ class ICCLut8:
             f"{self.e7}",
             f"{self.e8}",
             f"{self.e9}",
+            f"{self.input_tables}",
+            f"{self.clut}",
+            f"{self.output_tables}",
         ]
         return f"ICCLut8({', '.join(args)})"
