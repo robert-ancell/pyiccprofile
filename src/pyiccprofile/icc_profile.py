@@ -225,17 +225,24 @@ class ICCProfile:
         return bytes(data)
 
     def __repr__(self) -> str:
-        rendering_intent_str = {
-            ICCRenderingIntent.PERCEPTUAL: "PERCEPTUAL",
-            ICCRenderingIntent.MEDIA_RELATIVE_COLORIMETRIC: "MEDIA_RELATIVE_COLORIMETRIC",
-            ICCRenderingIntent.SATURATION: "SATURATION",
-            ICCRenderingIntent.ICC_ABSOLUTE_COLORMETRIC: "ICC_ABSOLUTE_COLORMETRIC",
-        }
         args = []
         args.append(f"preferred_cmm_type={self.preferred_cmm_type}")
         if self.version != _DEFAULT_VERSION:
             args.append(f"version={self.version}")
-        args.append(f"profile_class={self.profile_class!r}")
+        profile_class_str = {
+            ICCProfileClass.INPUT: "INPUT",
+            ICCProfileClass.DISPLAY: "DISPLAY",
+            ICCProfileClass.OUTPUT: "OUTPUT",
+            ICCProfileClass.DEVICE_LINK: "DEVICE_LINK",
+            ICCProfileClass.COLOR_SPACE: "COLOR_SPACE",
+            ICCProfileClass.ABSTRACT: "ABSTRACT",
+            ICCProfileClass.NAMED_COLOR: "NAMED_COLOR",
+        }.get(self.profile_class, None)
+        if profile_class_str is None:
+            profile_class_str = repr(self.profile_class)
+        else:
+            profile_class_str = f"ICCProfileClass.{profile_class_str}"
+        args.append(f"profile_class={profile_class_str}")
         args.append(f"data_color_space={self.data_color_space!r}")
         args.append(f"pcs={self.pcs!r}")
         args.append(f"creation_time={self.creation_time}")
@@ -253,8 +260,16 @@ class ICCProfile:
             args.append(f"creator={self.creator!r}")
         if self.id != _NULL_ID:
             args.append(f"id={self.id!r}")
-        args.append(
-            f"rendering_intent=ICCRenderingIntent.{rendering_intent_str[self.rendering_intent]}"
-        )
+        rendering_intent_str = {
+            ICCRenderingIntent.PERCEPTUAL: "PERCEPTUAL",
+            ICCRenderingIntent.MEDIA_RELATIVE_COLORIMETRIC: "MEDIA_RELATIVE_COLORIMETRIC",
+            ICCRenderingIntent.SATURATION: "SATURATION",
+            ICCRenderingIntent.ICC_ABSOLUTE_COLORMETRIC: "ICC_ABSOLUTE_COLORMETRIC",
+        }.get(self.rendering_intent, None)
+        if rendering_intent_str is None:
+            rendering_intent_str = repr(self.rendering_intent)
+        else:
+            rendering_intent_str = f"ICCRenderingIntent.{rendering_intent_str}"
+        args.append(f"rendering_intent={rendering_intent_str}")
         args.append(f"tagged_elements={self.tagged_elements}")
         return f"ICCProfile({', '.join(args)})"
