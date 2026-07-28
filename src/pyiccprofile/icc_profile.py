@@ -1,5 +1,7 @@
 """ICC profile reader and writer."""
 
+from __future__ import annotations
+
 _DEFAULT_VERSION = (4, 4, 0)
 
 _NULL_SIGNATURE = b"\x00\x00\x00\x00"
@@ -83,7 +85,7 @@ def _append_uint64(data: bytearray, value: int) -> None:
     data.extend(value.to_bytes(8, byteorder="big"))
 
 def _append_s15fixed16_number(data: bytearray, value: float) -> None:
-    int_value = int(value * 65535)
+    int_value = int(value * 65536)
     data.extend(int_value.to_bytes(4, byteorder="big"))
 
 def _append_xyz_number(data: bytearray, value: tuple[float, float, float]) -> None:
@@ -123,7 +125,7 @@ class ICCMultiLocalizedUnicodeType:
         self.records = records
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCMultiLocalizedUnicodeType":
+    def decode(cls, data: bytes) -> ICCMultiLocalizedUnicodeType:
         if len(data) < 16:
             raise ValueError("Invalid length multi-localized unicode type")
 
@@ -193,17 +195,17 @@ class ICCLut8:
         self.e9 = e9
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCLut8":
+    def decode(cls, data: bytes) -> ICCLut8:
         if len(data) < 48:
             raise ValueError("Insufficient data")
         signature = data[:4]
         if signature != b"mft1":
-            raise ValueError(f"Invalid signature: {signature}")
+            raise ValueError(f"Invalid signature: {signature!r}")
         if data[4:8] != b"\x00\x00\x00\x00":
             raise ValueError("Invalid reserved bytes")
-        n_input_channels = data[8]
-        n_output_channels = data[9]
-        n_clut_grid_points = data[10]
+        #n_input_channels = data[8]
+        #n_output_channels = data[9]
+        #n_clut_grid_points = data[10]
         if data[11] != 0:
             raise ValueError("Reserved byte must be 0")
         e1 = _get_s15fixed16_number(data, 12)
@@ -250,17 +252,17 @@ class ICCLut16:
         self.e9 = e9
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCLut16":
+    def decode(cls, data: bytes) -> ICCLut16:
         if len(data) < 48:
             raise ValueError("Insufficient data")
         signature = data[:4]
         if signature != b"mft2":
-            raise ValueError(f"Invalid signature: {signature}")
+            raise ValueError(f"Invalid signature: {signature!r}")
         if data[4:8] != b"\x00\x00\x00\x00":
             raise ValueError("Invalid reserved bytes")
-        n_input_channels = data[8]
-        n_output_channels = data[9]
-        n_clut_grid_points = data[10]
+        #n_input_channels = data[8]
+        #n_output_channels = data[9]
+        #n_clut_grid_points = data[10]
         if data[11] != 0:
             raise ValueError("Reserved byte must be 0")
         e1 = _get_s15fixed16_number(data, 12)
@@ -299,14 +301,14 @@ class ICCLutAToB:
         pass
 
     @classmethod
-    def decode(cls, data: bytes) -> "IccLutAToB":
+    def decode(cls, data: bytes) -> ICCLutAToB:
         signature = data[:4]
         if signature != b"mAB ":
-            raise ValueError(f"Invalid signature: {signature}")
+            raise ValueError(f"Invalid signature: {signature!r}")
         if data[4:8] != b"\x00\x00\x00\x00":
             raise ValueError("Invalid reserved bytes")
-        n_input_channels = data[8]
-        n_output_channels = data[9]
+        #n_input_channels = data[8]
+        #n_output_channels = data[9]
         if data[10] != 0 or data[11] != 0:
             raise ValueError("Invalid reserved bytes")
         return cls()
@@ -317,21 +319,21 @@ class ICCLutAToB:
         # FIXME
 
     def __repr__(self) -> str:
-        return f"ICCLutAToB()"
+        return "ICCLutAToB()"
 
 class ICCLutBToA:
     def __init__(self):
         pass
 
     @classmethod
-    def decode(cls, data: bytes) -> "IccLutBToA":
+    def decode(cls, data: bytes) -> ICCLutBToA:
         signature = data[:4]
         if signature != b"mBA ":
-            raise ValueError(f"Invalid signature: {signature}")
+            raise ValueError(f"Invalid signature: {signature!r}")
         if data[4:8] != b"\x00\x00\x00\x00":
             raise ValueError("Invalid reserved bytes")
-        n_input_channels = data[8]
-        n_output_channels = data[9]
+        #n_input_channels = data[8]
+        #n_output_channels = data[9]
         if data[10] != 0 or data[11] != 0:
             raise ValueError("Invalid reserved bytes")
         return cls()
@@ -342,7 +344,7 @@ class ICCLutBToA:
         # FIXME
 
     def __repr__(self) -> str:
-        return f"ICCLutBToA()"
+        return "ICCLutBToA()"
 
 class ICCProfileClass:
     INPUT = b"scnr"
@@ -378,7 +380,7 @@ class ICCDateTime:
         self.seconds = seconds
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCDateTime":
+    def decode(cls, data: bytes) -> ICCDateTime:
         if len(data) != 12:
             raise ValueError("Invalid ICCDateTime data")
         year = _get_uint16(data, 0)
@@ -415,7 +417,7 @@ class ICCDateTime:
 
 class ICCTaggedElement:
     @classmethod
-    def decode(cls, data: bytes) -> "ICCTaggedElement":
+    def decode(cls, data: bytes) -> ICCTaggedElement:
         raise NotImplementedError()
 
 
@@ -424,7 +426,7 @@ class ICCProfileDescription(ICCTaggedElement):
         self.description = description
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCProfileDescription":
+    def decode(cls, data: bytes) -> ICCProfileDescription:
         description = ICCMultiLocalizedUnicodeType.decode(data)
         return cls(description)
 
@@ -440,7 +442,7 @@ class ICCCopyright(ICCTaggedElement):
         self.copyright = copyright
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCCopyright":
+    def decode(cls, data: bytes) -> ICCCopyright:
         copyright = ICCMultiLocalizedUnicodeType.decode(data)
         return cls(copyright)
 
@@ -456,7 +458,7 @@ class ICCChromaticAdaptation(ICCTaggedElement):
         self.matrix = matrix
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCChromaticAdaptation":
+    def decode(cls, data: bytes) -> ICCChromaticAdaptation:
         matrix = _decode_s15fixed16_array(data)
         if len(matrix) != 9:
             raise ValueError("Invalid matrix")
@@ -474,7 +476,7 @@ class ICCMediaWhitePoint(ICCTaggedElement):
         self.colors = colors
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCMediaWhitePoint":
+    def decode(cls, data: bytes) -> ICCMediaWhitePoint:
         colors = _decode_xyz(data)
         # FIXME: Can this be more than one color?
         return cls(colors)
@@ -490,18 +492,18 @@ class ICCPerceptualRenderingIntentGamut(ICCTaggedElement):
         pass
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCPerceptualRenderingIntentGamut":
+    def decode(cls, data: bytes) -> ICCPerceptualRenderingIntentGamut:
         return cls()
 
     def __repr__(self) -> str:
-        return f"ICCPerceptualRenderingIntentGamut(...)"
+        return "ICCPerceptualRenderingIntentGamut(...)"
 
 class ICCA2B0(ICCTaggedElement):
     def __init__(self, transform: ICCLut8 | ICCLut16 | ICCLutAToB):
         self.transform = transform
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCA2B0":
+    def decode(cls, data: bytes) -> ICCA2B0:
         transform = ICCLutAToB.decode(data)
         return cls(transform)
 
@@ -513,7 +515,7 @@ class ICCA2B1(ICCTaggedElement):
         self.transform = transform
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCA2B1":
+    def decode(cls, data: bytes) -> ICCA2B1:
         transform = ICCLutAToB.decode(data)
         return cls(transform)
 
@@ -525,7 +527,7 @@ class ICCA2B2(ICCTaggedElement):
         self.transform = transform
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCA2B2":
+    def decode(cls, data: bytes) -> ICCA2B2:
         transform = ICCLutAToB.decode(data)
         return cls(transform)
 
@@ -537,7 +539,7 @@ class ICCB2A0(ICCTaggedElement):
         self.transform = transform
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCB2A0":
+    def decode(cls, data: bytes) -> ICCB2A0:
         transform = ICCLutBToA.decode(data)
         return cls(transform)
 
@@ -549,7 +551,7 @@ class ICCB2A1(ICCTaggedElement):
         self.transform = transform
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCB2A1":
+    def decode(cls, data: bytes) -> ICCB2A1:
         transform = ICCLutBToA.decode(data)
         return cls(transform)
 
@@ -561,7 +563,7 @@ class ICCB2A2(ICCTaggedElement):
         self.transform = transform
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCB2A2":
+    def decode(cls, data: bytes) -> ICCB2A2:
         transform = ICCLutBToA.decode(data)
         return cls(transform)
 
@@ -627,7 +629,7 @@ class ICCProfile:
         self.tagged_elements = tagged_elements
 
     @classmethod
-    def decode(cls, data: bytes) -> "ICCProfile":
+    def decode(cls, data: bytes) -> ICCProfile:
         if len(data) < 132:
             raise ValueError("ICC profile data is too short")
 
