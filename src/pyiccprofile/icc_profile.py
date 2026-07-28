@@ -9,18 +9,16 @@ from pyiccprofile.b2a0 import ICCB2A0
 from pyiccprofile.b2a1 import ICCB2A1
 from pyiccprofile.b2a2 import ICCB2A2
 from pyiccprofile.chromatic_adaptation import ICCChromaticAdaptation
-from pyiccprofile.copyright import ICCCopyright
-from pyiccprofile.decoder import (
+from pyiccprofile.codec import (
+    ICCDateTime,
     decode_signature,
-    decode_uint16,
     decode_uint32,
     decode_uint64,
-)
-from pyiccprofile.element import ICCTaggedElement, ICCUnknownTaggedElement
-from pyiccprofile.encoder import (
     encode_uint32,
     encode_uint64,
 )
+from pyiccprofile.copyright import ICCCopyright
+from pyiccprofile.element import ICCTaggedElement, ICCUnknownTaggedElement
 from pyiccprofile.media_white_point import ICCMediaWhitePoint
 from pyiccprofile.perceptual_rendering_intent_gamut import (
     ICCPerceptualRenderingIntentGamut,
@@ -54,53 +52,6 @@ class ICCRenderingIntent:
     MEDIA_RELATIVE_COLORIMETRIC = 1
     SATURATION = 2
     ICC_ABSOLUTE_COLORMETRIC = 3
-
-
-class ICCDateTime:
-    def __init__(
-        self, year: int, month: int, day: int, hours: int, minutes: int, seconds: int
-    ):
-        self.year = year
-        self.month = month
-        self.day = day
-        self.hours = hours
-        self.minutes = minutes
-        self.seconds = seconds
-
-    @classmethod
-    def decode(cls, data: bytes) -> ICCDateTime:
-        if len(data) != 12:
-            raise ValueError("Invalid ICCDateTime data")
-        year = decode_uint16(data, 0)
-        month = decode_uint16(data, 2)
-        if month < 1 or month > 12:
-            raise ValueError("Invalid month")
-        day = decode_uint16(data, 4)
-        if day < 1 or day > 31:
-            raise ValueError("Invalid day")
-        hours = decode_uint16(data, 6)
-        if hours > 23:
-            raise ValueError("Invalid hours")
-        minutes = decode_uint16(data, 8)
-        if minutes > 59:
-            raise ValueError("Invalid minutes")
-        seconds = decode_uint16(data, 10)
-        if seconds > 59:
-            raise ValueError("Invalid seconds")
-        return cls(year, month, day, hours, minutes, seconds)
-
-    def encode(self, data: bytearray) -> None:
-        data.extend(
-            self.year.to_bytes(2, "big")
-            + self.month.to_bytes(2, "big")
-            + self.day.to_bytes(2, "big")
-            + self.hours.to_bytes(2, "big")
-            + self.minutes.to_bytes(2, "big")
-            + self.seconds.to_bytes(2, "big")
-        )
-
-    def __repr__(self) -> str:
-        return f"ICCDateTime({self.year}, {self.month}, {self.day}, {self.hours}, {self.minutes}, {self.seconds})"
 
 
 class ICCProfile:

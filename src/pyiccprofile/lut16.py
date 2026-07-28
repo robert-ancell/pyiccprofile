@@ -1,5 +1,4 @@
-from pyiccprofile.decoder import decode_s15fixed16_number
-from pyiccprofile.encoder import encode_s15fixed16_number
+from pyiccprofile.codec import decode_s15fixed16_number, encode_s15fixed16_number
 
 
 class ICCLut16:

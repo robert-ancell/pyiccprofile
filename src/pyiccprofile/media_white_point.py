@@ -1,6 +1,5 @@
-from pyiccprofile.decoder import decode_xyz
+from pyiccprofile.codec import decode_xyz, encode_xyz
 from pyiccprofile.element import ICCTaggedElement
-from pyiccprofile.encoder import encode_xyz
 
 
 class ICCMediaWhitePoint(ICCTaggedElement):

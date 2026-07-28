@@ -1,6 +1,5 @@
-from pyiccprofile.decoder import decode_s15fixed16_array
+from pyiccprofile.codec import decode_s15fixed16_array, encode_s15fixed16_array
 from pyiccprofile.element import ICCTaggedElement
-from pyiccprofile.encoder import encode_s15fixed16_array
 
 
 class ICCChromaticAdaptation(ICCTaggedElement):

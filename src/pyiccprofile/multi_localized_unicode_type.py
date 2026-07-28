@@ -1,5 +1,4 @@
-from pyiccprofile.decoder import decode_signature, decode_uint32
-from pyiccprofile.encoder import encode_uint32
+from pyiccprofile.codec import decode_signature, decode_uint32, encode_uint32
 
 
 class ICCMultiLocalizedUnicodeTypeRecord:

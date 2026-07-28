@@ -1,0 +1,149 @@
+def encode_uint32(data: bytearray, value: int) -> None:
+    data.extend(value.to_bytes(4, byteorder="big"))
+
+
+def encode_uint64(data: bytearray, value: int) -> None:
+    data.extend(value.to_bytes(8, byteorder="big"))
+
+
+def encode_s15fixed16_number(data: bytearray, value: float) -> None:
+    int_value = int(value * 65536)
+    data.extend(int_value.to_bytes(4, byteorder="big"))
+
+
+def encode_xyz_number(data: bytearray, value: tuple[float, float, float]) -> None:
+    encode_s15fixed16_number(data, value[0])
+    encode_s15fixed16_number(data, value[1])
+    encode_s15fixed16_number(data, value[2])
+
+
+def encode_s15fixed16_array(data: bytearray, values: list[float]) -> None:
+    data.extend(b"sf32")
+    data.extend(b"\x00\x00\x00\x00")
+    for value in values:
+        encode_s15fixed16_number(data, value)
+
+
+def encode_xyz(data: bytearray, values: list[tuple[float, float, float]]) -> None:
+    data.extend(b"XYZ ")
+    data.extend(b"\x00\x00\x00\x00")
+    for value in values:
+        encode_xyz_number(data, value)
+
+
+def decode_uint16(data: bytes, offset: int) -> int:
+    return int.from_bytes(data[offset : offset + 2], byteorder="big")
+
+
+def decode_uint32(data: bytes, offset: int) -> int:
+    return int.from_bytes(data[offset : offset + 4], byteorder="big")
+
+
+def decode_uint64(data: bytes, offset: int) -> int:
+    return int.from_bytes(data[offset : offset + 8], byteorder="big")
+
+
+def decode_s15fixed16_number(data: bytes, offset: int) -> float:
+    v = int.from_bytes(data[offset : offset + 4], byteorder="big", signed=True)
+    return v / 65536.0
+
+
+def decode_u15fixed16_number(data: bytes, offset: int) -> float:
+    return decode_uint32(data, offset) / 65536.0
+
+
+def decode_xyz_number(data: bytes, offset: int) -> tuple[float, float, float]:
+    return (
+        decode_s15fixed16_number(data, offset),
+        decode_s15fixed16_number(data, offset + 4),
+        decode_s15fixed16_number(data, offset + 8),
+    )
+
+
+def decode_signature(data: bytes, offset: int) -> bytes:
+    return data[offset : offset + 4]
+
+
+def decode_s15fixed16_array(data: bytes) -> list[float]:
+    if len(data) < 8 or len(data) % 4 != 0:
+        raise ValueError("Invalid length")
+    signature = decode_signature(data, 0)
+    if signature != b"sf32":
+        raise ValueError("Invalid signature")
+    reserved = data[4:8]
+    if reserved != b"\x00\x00\x00\x00":
+        raise ValueError("Reserved field must be 0")
+    offset = 8
+    count = (len(data) - offset) // 4
+    values = []
+    for _ in range(count):
+        values.append(decode_s15fixed16_number(data, offset))
+        offset += 4
+    return values
+
+
+def decode_xyz(data: bytes) -> list[tuple[float, float, float]]:
+    if len(data) < 8 or len(data) % 4 != 0:
+        raise ValueError("Invalid length")
+    signature = decode_signature(data, 0)
+    if signature != b"XYZ ":
+        raise ValueError("Invalid signature")
+    reserved = data[4:8]
+    if reserved != b"\x00\x00\x00\x00":
+        raise ValueError("Reserved field must be 0")
+    offset = 8
+    count = (len(data) - offset) // 4
+    if count % 3 != 0:
+        raise ValueError("Invalid count")
+    values = []
+    for _ in range(0, count, 3):
+        values.append(decode_xyz_number(data, offset))
+        offset += 12
+    return values
+
+
+class ICCDateTime:
+    def __init__(
+        self, year: int, month: int, day: int, hours: int, minutes: int, seconds: int
+    ):
+        self.year = year
+        self.month = month
+        self.day = day
+        self.hours = hours
+        self.minutes = minutes
+        self.seconds = seconds
+
+    @classmethod
+    def decode(cls, data: bytes) -> "ICCDateTime":
+        if len(data) != 12:
+            raise ValueError("Invalid ICCDateTime data")
+        year = decode_uint16(data, 0)
+        month = decode_uint16(data, 2)
+        if month < 1 or month > 12:
+            raise ValueError("Invalid month")
+        day = decode_uint16(data, 4)
+        if day < 1 or day > 31:
+            raise ValueError("Invalid day")
+        hours = decode_uint16(data, 6)
+        if hours > 23:
+            raise ValueError("Invalid hours")
+        minutes = decode_uint16(data, 8)
+        if minutes > 59:
+            raise ValueError("Invalid minutes")
+        seconds = decode_uint16(data, 10)
+        if seconds > 59:
+            raise ValueError("Invalid seconds")
+        return cls(year, month, day, hours, minutes, seconds)
+
+    def encode(self, data: bytearray) -> None:
+        data.extend(
+            self.year.to_bytes(2, "big")
+            + self.month.to_bytes(2, "big")
+            + self.day.to_bytes(2, "big")
+            + self.hours.to_bytes(2, "big")
+            + self.minutes.to_bytes(2, "big")
+            + self.seconds.to_bytes(2, "big")
+        )
+
+    def __repr__(self) -> str:
+        return f"ICCDateTime({self.year}, {self.month}, {self.day}, {self.hours}, {self.minutes}, {self.seconds})"
