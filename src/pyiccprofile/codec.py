@@ -26,14 +26,14 @@ def encode_xyz_number(data: bytearray, value: tuple[float, float, float]) -> Non
 
 
 def encode_s15fixed16_array(data: bytearray, values: list[float]) -> None:
-    data.extend(b"sf32")
+    encode_signature(data, b"sf32")
     data.extend(b"\x00\x00\x00\x00")
     for value in values:
         encode_s15fixed16_number(data, value)
 
 
 def encode_xyz(data: bytearray, values: list[tuple[float, float, float]]) -> None:
-    data.extend(b"XYZ ")
+    encode_signature(data, b"XYZ ")
     data.extend(b"\x00\x00\x00\x00")
     for value in values:
         encode_xyz_number(data, value)
@@ -79,8 +79,7 @@ def decode_signature(data: bytes, offset: int) -> bytes:
 def decode_s15fixed16_array(data: bytes) -> list[float]:
     if len(data) < 8 or len(data) % 4 != 0:
         raise ValueError("Invalid length")
-    signature = decode_signature(data, 0)
-    if signature != b"sf32":
+    if decode_signature(data, 0) != b"sf32":
         raise ValueError("Invalid signature")
     reserved = data[4:8]
     if reserved != b"\x00\x00\x00\x00":

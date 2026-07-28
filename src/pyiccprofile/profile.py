@@ -14,6 +14,7 @@ from pyiccprofile.codec import (
     decode_signature,
     decode_uint32,
     decode_uint64,
+    encode_signature,
     encode_uint32,
     encode_uint64,
 )
@@ -121,10 +122,9 @@ class ICCProfile:
         data_color_space = decode_signature(data, 16)
         pcs = decode_signature(data, 20)
         creation_time = ICCDateTime.decode(data[24:36])
-        signature = data[36:40]
-        if signature != b"acsp":
+        if decode_signature(data, 36) != b"acsp":
             raise ValueError("ICC profile signature is not valid")
-        primary_platform = data[40:44]
+        primary_platform = decode_signature(data, 40)
         flags = decode_uint32(data, 44)
         device_manufacturer = decode_signature(data, 48)
         device_model = decode_signature(data, 52)
@@ -202,21 +202,21 @@ class ICCProfile:
         data.append(self.version[1] << 4 | self.version[2])
         data.append(0)
         data.append(0)
-        data.extend(self.profile_class)
-        data.extend(self.data_color_space)
-        data.extend(self.pcs)
+        encode_signature(data, self.profile_class)
+        encode_signature(data, self.data_color_space)
+        encode_signature(data, self.pcs)
         self.creation_time.encode(data)
-        data.extend(b"acsp")
-        data.extend(self.primary_platform)
+        encode_signature(data, b"acsp")
+        encode_signature(data, self.primary_platform)
         encode_uint32(data, self.flags)
-        data.extend(self.device_manufacturer)
-        data.extend(self.device_model)
+        encode_signature(data, self.device_manufacturer)
+        encode_signature(data, self.device_model)
         encode_uint64(data, self.device_attributes)
         encode_uint32(data, self.rendering_intent)
         # FIXME nCIEXYZ values
         for _ in range(12):
             data.append(0)
-        data.extend(self.creator)
+        encode_signature(data, self.creator)
         data.extend(self.id)
         for _ in range(28):
             data.append(0)

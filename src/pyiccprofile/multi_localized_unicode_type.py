@@ -1,4 +1,9 @@
-from pyiccprofile.codec import decode_signature, decode_uint32, encode_uint32
+from pyiccprofile.codec import (
+    decode_signature,
+    decode_uint32,
+    encode_signature,
+    encode_uint32,
+)
 
 
 class ICCMultiLocalizedUnicodeTypeRecord:
@@ -61,7 +66,7 @@ class ICCMultiLocalizedUnicodeType:
         return cls(records)
 
     def encode(self, data: bytearray) -> None:
-        data.extend(ICCMultiLocalizedUnicodeType.SIGNATURE)
+        encode_signature(data, ICCMultiLocalizedUnicodeType.SIGNATURE)
         data.extend(b"\x00\x00\x00\x00")
         encode_uint32(data, len(self.records))
         encode_uint32(data, 12)
