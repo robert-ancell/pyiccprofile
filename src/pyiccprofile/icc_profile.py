@@ -2,23 +2,24 @@
 
 from __future__ import annotations
 
+from pyiccprofile.chromatic_adaptation import ICCChromaticAdaptation
 from pyiccprofile.copyright import ICCCopyright
 from pyiccprofile.decoder import (
-    decode_s15fixed16_array,
     decode_s15fixed16_number,
     decode_signature,
     decode_uint16,
     decode_uint32,
     decode_uint64,
-    decode_xyz,
 )
-from pyiccprofile.element import ICCTaggedElement
+from pyiccprofile.element import ICCTaggedElement, ICCUnknownTaggedElement
 from pyiccprofile.encoder import (
-    encode_s15fixed16_array,
     encode_s15fixed16_number,
     encode_uint32,
     encode_uint64,
-    encode_xyz,
+)
+from pyiccprofile.media_white_point import ICCMediaWhitePoint
+from pyiccprofile.perceptual_rendering_intent_gamut import (
+    ICCPerceptualRenderingIntentGamut,
 )
 from pyiccprofile.profile_description import ICCProfileDescription
 
@@ -266,55 +267,6 @@ class ICCDateTime:
         return f"ICCDateTime({self.year}, {self.month}, {self.day}, {self.hours}, {self.minutes}, {self.seconds})"
 
 
-class ICCChromaticAdaptation(ICCTaggedElement):
-    def __init__(self, matrix: list[float]):
-        self.matrix = matrix
-
-    @classmethod
-    def decode(cls, data: bytes) -> ICCChromaticAdaptation:
-        matrix = decode_s15fixed16_array(data)
-        if len(matrix) != 9:
-            raise ValueError("Invalid matrix")
-        return cls(matrix)
-
-    def encode(self, data: bytearray) -> None:
-        encode_s15fixed16_array(data, self.matrix)
-
-    def __repr__(self) -> str:
-        return f"ICCChromaticAdaptation({self.matrix})"
-
-
-class ICCMediaWhitePoint(ICCTaggedElement):
-    def __init__(self, colors: list[tuple[float, float, float]]):
-        self.colors = colors
-
-    @classmethod
-    def decode(cls, data: bytes) -> ICCMediaWhitePoint:
-        colors = decode_xyz(data)
-        # FIXME: Can this be more than one color?
-        return cls(colors)
-
-    def encode(self, data: bytearray) -> None:
-        encode_xyz(data, self.colors)
-
-    def __repr__(self) -> str:
-        return f"ICCMediaWhitePoint({self.colors})"
-
-
-class ICCPerceptualRenderingIntentGamut(ICCTaggedElement):
-    def __init__(
-        self,
-    ):
-        pass
-
-    @classmethod
-    def decode(cls, data: bytes) -> ICCPerceptualRenderingIntentGamut:
-        return cls()
-
-    def __repr__(self) -> str:
-        return "ICCPerceptualRenderingIntentGamut(...)"
-
-
 class ICCA2B0(ICCTaggedElement):
     def __init__(self, transform: ICCLut8 | ICCLut16 | ICCLutAToB):
         self.transform = transform
@@ -391,15 +343,6 @@ class ICCB2A2(ICCTaggedElement):
 
     def __repr__(self) -> str:
         return f"ICCB2A2({self.transform})"
-
-
-class ICCUnknownTaggedElement(ICCTaggedElement):
-    def __init__(self, signature: bytes, data: bytes):
-        self.signature = signature
-        self.data = data
-
-    def __repr__(self) -> str:
-        return f"ICCUnknownTaggedData({self.signature!r}, ...)"
 
 
 class ICCProfile:
