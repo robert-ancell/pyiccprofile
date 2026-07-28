@@ -2,6 +2,8 @@ from pyiccprofile.codec import decode_s15fixed16_number, encode_s15fixed16_numbe
 
 
 class ICCLut16:
+    SIGNATURE = b"mft2"
+
     def __init__(self, e1, e2, e3, e4, e5, e6, e7, e8, e9):
         self.e1 = e1
         self.e2 = e2
@@ -18,7 +20,7 @@ class ICCLut16:
         if len(data) < 48:
             raise ValueError("Insufficient data")
         signature = data[:4]
-        if signature != b"mft2":
+        if signature != ICCLut16.SIGNATURE:
             raise ValueError(f"Invalid signature: {signature!r}")
         if data[4:8] != b"\x00\x00\x00\x00":
             raise ValueError("Invalid reserved bytes")
@@ -41,7 +43,7 @@ class ICCLut16:
         return cls(e1, e2, e3, e4, e5, e6, e7, e8, e9)
 
     def encode(self, data: bytearray) -> None:
-        data.extend(b"mft2")
+        data.extend(ICCLut16.SIGNATURE)
         data.extend(b"\x00\x00\x00\x00")
         data.append(0)  # n_input_channels
         data.append(0)  # n_output_channels

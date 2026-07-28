@@ -1,11 +1,13 @@
 class ICCLutAToB:
+    SIGNATURE = b"mAB "
+
     def __init__(self):
         pass
 
     @classmethod
     def decode(cls, data: bytes) -> "ICCLutAToB":
         signature = data[:4]
-        if signature != b"mAB ":
+        if signature != ICCLutAToB.SIGNATURE:
             raise ValueError(f"Invalid signature: {signature!r}")
         if data[4:8] != b"\x00\x00\x00\x00":
             raise ValueError("Invalid reserved bytes")
@@ -16,7 +18,7 @@ class ICCLutAToB:
         return cls()
 
     def encode(self, data: bytearray) -> None:
-        data.extend(b"mAB ")
+        data.extend(ICCLutAToB.SIGNATURE)
         data.extend(b"\x00\x00\x00\x00")
         # FIXME
 

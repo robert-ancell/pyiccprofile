@@ -2,6 +2,8 @@ from pyiccprofile.element import ICCTaggedElement
 
 
 class ICCPerceptualRenderingIntentGamut(ICCTaggedElement):
+    SIGNATURE = b"rig0"
+
     def __init__(
         self,
     ):

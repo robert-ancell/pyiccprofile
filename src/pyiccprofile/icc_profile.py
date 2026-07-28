@@ -155,17 +155,17 @@ class ICCProfile:
             if offset < data_start or offset + length > len(data):
                 raise ValueError("ICC profile tag data is out of bounds")
             tag_class: type[ICCTaggedElement] | None = {
-                b"desc": ICCProfileDescription,
-                b"cprt": ICCCopyright,
-                b"chad": ICCChromaticAdaptation,
-                b"wtpt": ICCMediaWhitePoint,
-                b"rig0": ICCPerceptualRenderingIntentGamut,
-                b"A2B0": ICCA2B0,
-                b"A2B1": ICCA2B1,
-                b"A2B2": ICCA2B2,
-                b"B2A0": ICCB2A0,
-                b"B2A1": ICCB2A1,
-                b"B2A2": ICCB2A2,
+                ICCProfileDescription.SIGNATURE: ICCProfileDescription,
+                ICCCopyright.SIGNATURE: ICCCopyright,
+                ICCChromaticAdaptation.SIGNATURE: ICCChromaticAdaptation,
+                ICCMediaWhitePoint.SIGNATURE: ICCMediaWhitePoint,
+                ICCPerceptualRenderingIntentGamut.SIGNATURE: ICCPerceptualRenderingIntentGamut,
+                ICCA2B0.SIGNATURE: ICCA2B0,
+                ICCA2B1.SIGNATURE: ICCA2B1,
+                ICCA2B2.SIGNATURE: ICCA2B2,
+                ICCB2A0.SIGNATURE: ICCB2A0,
+                ICCB2A1.SIGNATURE: ICCB2A1,
+                ICCB2A2.SIGNATURE: ICCB2A2,
             }.get(tag_signature, None)
             if tag_class is not None:
                 element = tag_class.decode(data[offset : offset + length])

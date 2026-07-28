@@ -3,6 +3,8 @@ from pyiccprofile.multi_localized_unicode_type import ICCMultiLocalizedUnicodeTy
 
 
 class ICCProfileDescription(ICCTaggedElement):
+    SIGNATURE = b"desc"
+
     def __init__(self, description: ICCMultiLocalizedUnicodeType):
         self.description = description
 

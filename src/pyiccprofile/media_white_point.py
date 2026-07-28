@@ -3,6 +3,8 @@ from pyiccprofile.element import ICCTaggedElement
 
 
 class ICCMediaWhitePoint(ICCTaggedElement):
+    SIGNATURE = b"wtpt"
+
     def __init__(self, colors: list[tuple[float, float, float]]):
         self.colors = colors
 

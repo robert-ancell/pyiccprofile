@@ -7,6 +7,8 @@ from pyiccprofile.lut_atob import ICCLutAToB
 
 
 class ICCA2B0(ICCTaggedElement):
+    SIGNATURE = b"A2B0"
+
     def __init__(self, transform: ICCLut8 | ICCLut16 | ICCLutAToB):
         self.transform = transform
 

@@ -16,6 +16,8 @@ class ICCMultiLocalizedUnicodeTypeRecord:
 
 
 class ICCMultiLocalizedUnicodeType:
+    SIGNATURE = b"mluc"
+
     def __init__(self, records: list[ICCMultiLocalizedUnicodeTypeRecord]):
         self.records = records
 
@@ -25,7 +27,7 @@ class ICCMultiLocalizedUnicodeType:
             raise ValueError("Invalid length multi-localized unicode type")
 
         signature = decode_signature(data, 0)
-        if signature != b"mluc":
+        if signature != ICCMultiLocalizedUnicodeType.SIGNATURE:
             raise ValueError("Invalid signature for multi-localized unicode type")
         reserved = decode_uint32(data, 4)
         if reserved != 0:
@@ -59,7 +61,7 @@ class ICCMultiLocalizedUnicodeType:
         return cls(records)
 
     def encode(self, data: bytearray) -> None:
-        data.extend(b"mluc")
+        data.extend(ICCMultiLocalizedUnicodeType.SIGNATURE)
         data.extend(b"\x00\x00\x00\x00")
         encode_uint32(data, len(self.records))
         encode_uint32(data, 12)

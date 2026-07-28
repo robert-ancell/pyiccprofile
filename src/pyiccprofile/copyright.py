@@ -3,6 +3,8 @@ from pyiccprofile.multi_localized_unicode_type import ICCMultiLocalizedUnicodeTy
 
 
 class ICCCopyright(ICCTaggedElement):
+    SIGNATURE = b"cprt"
+
     def __init__(self, copyright: ICCMultiLocalizedUnicodeType):
         self.copyright = copyright
 

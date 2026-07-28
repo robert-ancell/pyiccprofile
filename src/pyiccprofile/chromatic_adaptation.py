@@ -3,6 +3,8 @@ from pyiccprofile.element import ICCTaggedElement
 
 
 class ICCChromaticAdaptation(ICCTaggedElement):
+    SIGNATURE = b"chad"
+
     def __init__(self, matrix: list[float]):
         self.matrix = matrix
 
