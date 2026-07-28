@@ -6,4 +6,10 @@ from pyiccprofile.icc_profile import (
     ICCProfileDescription,
 )
 
-__all__ = ["ICCDataColorSpace", "ICCDateTime", "ICCProfile", "ICCProfileClass", "ICCProfileDescription"]
+__all__ = [
+    "ICCDataColorSpace",
+    "ICCDateTime",
+    "ICCProfile",
+    "ICCProfileClass",
+    "ICCProfileDescription",
+]
