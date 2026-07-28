@@ -31,6 +31,10 @@ def encode_xyz(data: bytearray, values: list[tuple[float, float, float]]) -> Non
         encode_xyz_number(data, value)
 
 
+def encode_signature(data: bytearray, signature: bytes) -> None:
+    data.extend(signature)
+
+
 def decode_uint16(data: bytes, offset: int) -> int:
     return int.from_bytes(data[offset : offset + 2], byteorder="big")
 

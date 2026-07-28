@@ -1,6 +1,24 @@
-from pyiccprofile.codec import decode_s15fixed16_number, encode_s15fixed16_number
+from pyiccprofile.codec import (
+    decode_s15fixed16_number,
+    decode_signature,
+    encode_s15fixed16_number,
+    encode_signature,
+)
 
 _TABLE_ENTRIES = 256  # lut8Type always uses fixed 256-entry 1D tables
+
+
+def _get_n_clut_grid_points(
+    input_tables: list[list[int]], clut: list[list[int]]
+) -> int:
+    n_clut_grid_points = 1
+    while True:
+        n_clut_entries = n_clut_grid_points ** len(input_tables)
+        if n_clut_entries == len(clut):
+            return n_clut_grid_points
+        if n_clut_entries > len(clut):
+            raise ValueError("Invalid CLUT length")
+        n_clut_grid_points += 1
 
 
 class ICCLut8:
@@ -21,14 +39,17 @@ class ICCLut8:
         clut: list[list[int]],
         output_tables: list[list[int]],
     ):
+        if len(input_tables) > 255:
+            raise ValueError("Too many input tables")
         for table in input_tables:
             if len(table) != _TABLE_ENTRIES:
                 raise ValueError(f"Input table must have {_TABLE_ENTRIES} entries")
-        if len(clut) % len(input_tables) != 0:
-            raise ValueError("CLUT must have a multiple of the number of input tables")
+        _get_n_clut_grid_points(input_tables, clut)
         for entry in clut:
             if len(entry) != len(output_tables):
                 raise ValueError("CLUT entry must have n_output_channels values")
+        if len(output_tables) > 255:
+            raise ValueError("Too many output tables")
         for table in output_tables:
             if len(table) != _TABLE_ENTRIES:
                 raise ValueError(f"Output table must have {_TABLE_ENTRIES} entries")
@@ -50,7 +71,7 @@ class ICCLut8:
     def decode(cls, data: bytes) -> "ICCLut8":
         if len(data) < 48:
             raise ValueError("Insufficient data")
-        signature = data[:4]
+        signature = decode_signature(data, 0)
         if signature != ICCLut8.SIGNATURE:
             raise ValueError(f"Invalid signature: {signature!r}")
         if data[4:8] != b"\x00\x00\x00\x00":
@@ -116,11 +137,11 @@ class ICCLut8:
         )
 
     def encode(self, data: bytearray) -> None:
-        data.extend(ICCLut8.SIGNATURE)
+        encode_signature(data, ICCLut8.SIGNATURE)
         data.extend(b"\x00\x00\x00\x00")
         data.append(len(self.input_tables))
         data.append(len(self.output_tables))
-        data.append(len(self.clut) // len(self.input_tables))
+        data.append(_get_n_clut_grid_points(self.input_tables, self.clut))
         data.append(0)
         encode_s15fixed16_number(data, self.e1)
         encode_s15fixed16_number(data, self.e2)
