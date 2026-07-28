@@ -43,9 +43,32 @@ class ICCProfileClass:
     NAMED_COLOR = b"nmcl"
 
 
-class ICCDataColorSpace:
-    NCIEXYZ = b"XYZ "
-    CIELAB = b"LAB "
+class ICCColorSpace:
+    XYZ = b"XYZ "
+    LAB = b"Lab "
+    CIE_LUV = b"Luv "
+    YCBBCR = b"YCbr"
+    CIE_YXY = b"Yxy "
+    RGB = b"RGB "
+    GRAY = b"GRAY"
+    HSV = b"HSV "
+    HSL = b"HSL "
+    CMYK = b"CMYK"
+    CMY = b"CMY "
+    TWO_COLOR = b"2CLR"
+    THREE_COLOR = b"3CLR"
+    FOUR_COLOR = b"4CLR"
+    FIVE_COLOR = b"5CLR"
+    SIX_COLOR = b"6CLR"
+    SEVEN_COLOR = b"7CLR"
+    EIGHT_COLOR = b"8CLR"
+    NINE_COLOR = b"9CLR"
+    TEN_COLOR = b"10CLR"
+    ELEVEN_COLOR = b"11CLR"
+    TWELVE_COLOR = b"12CLR"
+    THIRTEEN_COLOR = b"13CLR"
+    FOURTEEN_COLOR = b"14CLR"
+    FIFTEEN_COLOR = b"15CLR"
 
 
 class ICCRenderingIntent:
@@ -243,8 +266,43 @@ class ICCProfile:
         else:
             profile_class_str = f"ICCProfileClass.{profile_class_str}"
         args.append(f"profile_class={profile_class_str}")
-        args.append(f"data_color_space={self.data_color_space!r}")
-        args.append(f"pcs={self.pcs!r}")
+        data_color_space_str_map = {
+            ICCColorSpace.XYZ: "XYZ",
+            ICCColorSpace.LAB: "LAB",
+            ICCColorSpace.CIE_LUV: "CIE_LUV",
+            ICCColorSpace.YCBBCR: "YCBBCR",
+            ICCColorSpace.CIE_YXY: "CIE_YXY",
+            ICCColorSpace.RGB: "RGB",
+            ICCColorSpace.GRAY: "GRAY",
+            ICCColorSpace.HSV: "HSV",
+            ICCColorSpace.HSL: "HSL",
+            ICCColorSpace.CMYK: "CMYK",
+            ICCColorSpace.CMY: "CMY",
+            ICCColorSpace.TWO_COLOR: "TWO_COLOR",
+            ICCColorSpace.THREE_COLOR: "THREE_COLOR",
+            ICCColorSpace.FOUR_COLOR: "FOUR_COLOR",
+            ICCColorSpace.FIVE_COLOR: "FIVE_COLOR",
+            ICCColorSpace.SIX_COLOR: "SIX_COLOR",
+            ICCColorSpace.SEVEN_COLOR: "SEVEN_COLOR",
+            ICCColorSpace.EIGHT_COLOR: "EIGHT_COLOR",
+            ICCColorSpace.NINE_COLOR: "NINE_COLOR",
+            ICCColorSpace.TEN_COLOR: "TEN_COLOR",
+            ICCColorSpace.ELEVEN_COLOR: "ELEVEN_COLOR",
+            ICCColorSpace.TWELVE_COLOR: "TWELVE_COLOR",
+            ICCColorSpace.THIRTEEN_COLOR: "THIRTEEN_COLOR",
+            ICCColorSpace.FOURTEEN_COLOR: "FOURTEEN_COLOR",
+            ICCColorSpace.FIFTEEN_COLOR: "FIFTEEN_COLOR",
+        }
+
+        def get_color_space_str(color_space: bytes) -> str:
+            str = data_color_space_str_map.get(color_space, None)
+            if str is None:
+                return repr(color_space)
+            else:
+                return f"ICCColorSpace.{str}"
+
+        args.append(f"data_color_space={get_color_space_str(self.data_color_space)}")
+        args.append(f"pcs={get_color_space_str(self.pcs)}")
         args.append(f"creation_time={self.creation_time}")
         if self.flags != 0:
             args.append(f"flags={self.flags}")
