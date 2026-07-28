@@ -7,14 +7,14 @@ from pyiccprofile.lut16 import ICCLut16
 from pyiccprofile.lut_atob import ICCLutAToB
 
 
-class ICCA2B0(ICCTaggedElement):
-    SIGNATURE = b"A2B0"
+class ICCAToB2(ICCTaggedElement):
+    SIGNATURE = b"A2B2"
 
     def __init__(self, transform: ICCLut8 | ICCLut16 | ICCLutAToB):
         self.transform = transform
 
     @classmethod
-    def decode(cls, data: bytes) -> ICCA2B0:
+    def decode(cls, data: bytes) -> ICCAToB2:
         signature = decode_signature(data, 0)
         transform: ICCLut8 | ICCLut16 | ICCLutAToB
         if signature == ICCLut8.SIGNATURE:
@@ -31,4 +31,4 @@ class ICCA2B0(ICCTaggedElement):
         self.transform.encode(data)
 
     def __repr__(self) -> str:
-        return f"ICCA2B0({self.transform})"
+        return f"ICCA2B2({self.transform})"

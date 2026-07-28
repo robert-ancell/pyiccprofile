@@ -1,10 +1,11 @@
-from pyiccprofile.icc_profile import (
+from pyiccprofile.codec import ICCDateTime
+from pyiccprofile.profile import (
     ICCDataColorSpace,
-    ICCDateTime,
     ICCProfile,
     ICCProfileClass,
-    ICCProfileDescription,
+    ICCRenderingIntent,
 )
+from pyiccprofile.profile_description import ICCProfileDescription
 
 __all__ = [
     "ICCDataColorSpace",
@@ -12,4 +13,5 @@ __all__ = [
     "ICCProfile",
     "ICCProfileClass",
     "ICCProfileDescription",
+    "ICCRenderingIntent",
 ]

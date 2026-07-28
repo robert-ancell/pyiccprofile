@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from pyiccprofile.a2b0 import ICCA2B0
-from pyiccprofile.a2b1 import ICCA2B1
-from pyiccprofile.a2b2 import ICCA2B2
-from pyiccprofile.b2a0 import ICCB2A0
-from pyiccprofile.b2a1 import ICCB2A1
-from pyiccprofile.b2a2 import ICCB2A2
+from pyiccprofile.atob0 import ICCAToB0
+from pyiccprofile.atob1 import ICCAToB1
+from pyiccprofile.atob2 import ICCAToB2
+from pyiccprofile.btoa0 import ICCBToA0
+from pyiccprofile.btoa1 import ICCBToA1
+from pyiccprofile.btoa2 import ICCBToA2
 from pyiccprofile.chromatic_adaptation import ICCChromaticAdaptation
 from pyiccprofile.codec import (
     ICCDateTime,
@@ -160,12 +160,12 @@ class ICCProfile:
                 ICCChromaticAdaptation.SIGNATURE: ICCChromaticAdaptation,
                 ICCMediaWhitePoint.SIGNATURE: ICCMediaWhitePoint,
                 ICCPerceptualRenderingIntentGamut.SIGNATURE: ICCPerceptualRenderingIntentGamut,
-                ICCA2B0.SIGNATURE: ICCA2B0,
-                ICCA2B1.SIGNATURE: ICCA2B1,
-                ICCA2B2.SIGNATURE: ICCA2B2,
-                ICCB2A0.SIGNATURE: ICCB2A0,
-                ICCB2A1.SIGNATURE: ICCB2A1,
-                ICCB2A2.SIGNATURE: ICCB2A2,
+                ICCAToB0.SIGNATURE: ICCAToB0,
+                ICCAToB1.SIGNATURE: ICCAToB1,
+                ICCAToB2.SIGNATURE: ICCAToB2,
+                ICCBToA0.SIGNATURE: ICCBToA0,
+                ICCBToA1.SIGNATURE: ICCBToA1,
+                ICCBToA2.SIGNATURE: ICCBToA2,
             }.get(tag_signature, None)
             if tag_class is not None:
                 element = tag_class.decode(data[offset : offset + length])
