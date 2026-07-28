@@ -27,5 +27,8 @@ class ICCB2A2(ICCTaggedElement):
             raise ValueError(f"Invalid signature: {signature!r}")
         return cls(transform)
 
+    def encode(self, data: bytearray) -> None:
+        self.transform.encode(data)
+
     def __repr__(self) -> str:
         return f"ICCB2A2({self.transform})"
