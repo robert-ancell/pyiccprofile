@@ -10,6 +10,10 @@ def encode_uint64(data: bytearray, value: int) -> None:
     data.extend(value.to_bytes(8, byteorder="big"))
 
 
+def encode_u16fixed16_number(data: bytearray, value: float) -> None:
+    encode_uint32(data, int(value * 65536))
+
+
 def encode_s15fixed16_number(data: bytearray, value: float) -> None:
     int_value = int(value * 65536)
     data.extend(int_value.to_bytes(4, byteorder="big"))
@@ -51,13 +55,13 @@ def decode_uint64(data: bytes, offset: int) -> int:
     return int.from_bytes(data[offset : offset + 8], byteorder="big")
 
 
+def decode_u16fixed16_number(data: bytes, offset: int) -> float:
+    return decode_uint32(data, offset) / 65536.0
+
+
 def decode_s15fixed16_number(data: bytes, offset: int) -> float:
     v = int.from_bytes(data[offset : offset + 4], byteorder="big", signed=True)
     return v / 65536.0
-
-
-def decode_u15fixed16_number(data: bytes, offset: int) -> float:
-    return decode_uint32(data, offset) / 65536.0
 
 
 def decode_xyz_number(data: bytes, offset: int) -> tuple[float, float, float]:
