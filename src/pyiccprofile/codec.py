@@ -16,7 +16,7 @@ def encode_u16fixed16_number(data: bytearray, value: float) -> None:
 
 def encode_s15fixed16_number(data: bytearray, value: float) -> None:
     int_value = int(value * 65536)
-    data.extend(int_value.to_bytes(4, byteorder="big"))
+    data.extend(int_value.to_bytes(4, byteorder="big", signed=True))
 
 
 def encode_xyz_number(data: bytearray, value: tuple[float, float, float]) -> None:
