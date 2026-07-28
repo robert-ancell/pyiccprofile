@@ -85,6 +85,20 @@ class ICCPrimaryPlatform:
     SUN_MICROSYSTEMS = b"SUNW"
 
 
+def _get_signature_name(signature_class: type, signature: bytes) -> str:
+    for name, value in signature_class.__dict__.items():
+        if value == signature:
+            return signature_class.__name__ + "." + name
+    return repr(signature)
+
+
+def _get_enum_name(enum_class: type, value: int) -> str:
+    for name, enum_value in enum_class.__dict__.items():
+        if enum_value == value:
+            return enum_class.__name__ + "." + name
+    return repr(value)
+
+
 class ICCProfile:
     def __init__(
         self,
@@ -262,72 +276,20 @@ class ICCProfile:
             args.append(f"preferred_cmm_type={self.preferred_cmm_type!r}")
         if self.version != _DEFAULT_VERSION:
             args.append(f"version={self.version}")
-        profile_class_str = {
-            ICCProfileClass.INPUT: "INPUT",
-            ICCProfileClass.DISPLAY: "DISPLAY",
-            ICCProfileClass.OUTPUT: "OUTPUT",
-            ICCProfileClass.DEVICE_LINK: "DEVICE_LINK",
-            ICCProfileClass.COLOR_SPACE: "COLOR_SPACE",
-            ICCProfileClass.ABSTRACT: "ABSTRACT",
-            ICCProfileClass.NAMED_COLOR: "NAMED_COLOR",
-        }.get(self.profile_class, None)
-        if profile_class_str is None:
-            profile_class_str = repr(self.profile_class)
-        else:
-            profile_class_str = f"ICCProfileClass.{profile_class_str}"
-        args.append(f"profile_class={profile_class_str}")
-        data_color_space_str_map = {
-            ICCColorSpace.XYZ: "XYZ",
-            ICCColorSpace.LAB: "LAB",
-            ICCColorSpace.CIE_LUV: "CIE_LUV",
-            ICCColorSpace.YCBBCR: "YCBBCR",
-            ICCColorSpace.CIE_YXY: "CIE_YXY",
-            ICCColorSpace.RGB: "RGB",
-            ICCColorSpace.GRAY: "GRAY",
-            ICCColorSpace.HSV: "HSV",
-            ICCColorSpace.HSL: "HSL",
-            ICCColorSpace.CMYK: "CMYK",
-            ICCColorSpace.CMY: "CMY",
-            ICCColorSpace.TWO_COLOR: "TWO_COLOR",
-            ICCColorSpace.THREE_COLOR: "THREE_COLOR",
-            ICCColorSpace.FOUR_COLOR: "FOUR_COLOR",
-            ICCColorSpace.FIVE_COLOR: "FIVE_COLOR",
-            ICCColorSpace.SIX_COLOR: "SIX_COLOR",
-            ICCColorSpace.SEVEN_COLOR: "SEVEN_COLOR",
-            ICCColorSpace.EIGHT_COLOR: "EIGHT_COLOR",
-            ICCColorSpace.NINE_COLOR: "NINE_COLOR",
-            ICCColorSpace.TEN_COLOR: "TEN_COLOR",
-            ICCColorSpace.ELEVEN_COLOR: "ELEVEN_COLOR",
-            ICCColorSpace.TWELVE_COLOR: "TWELVE_COLOR",
-            ICCColorSpace.THIRTEEN_COLOR: "THIRTEEN_COLOR",
-            ICCColorSpace.FOURTEEN_COLOR: "FOURTEEN_COLOR",
-            ICCColorSpace.FIFTEEN_COLOR: "FIFTEEN_COLOR",
-        }
-
-        def get_color_space_str(color_space: bytes) -> str:
-            str = data_color_space_str_map.get(color_space, None)
-            if str is None:
-                return repr(color_space)
-            else:
-                return f"ICCColorSpace.{str}"
-
-        args.append(f"data_color_space={get_color_space_str(self.data_color_space)}")
-        args.append(f"pcs={get_color_space_str(self.pcs)}")
+        args.append(
+            f"profile_class={_get_signature_name(ICCProfileClass, self.profile_class)}"
+        )
+        args.append(
+            f"data_color_space={_get_signature_name(ICCColorSpace, self.data_color_space)}"
+        )
+        args.append(f"pcs={_get_signature_name(ICCColorSpace, self.pcs)}")
         args.append(f"creation_time={self.creation_time}")
         if self.flags != 0:
             args.append(f"flags={self.flags}")
         if self.primary_platform != _NULL_SIGNATURE:
-            primary_platform_str = {
-                ICCPrimaryPlatform.APPLE_COMPUTER_INC: "APPLE_COMPUTER_INC",
-                ICCPrimaryPlatform.MICROSOFT_CORPORATION: "MICROSOFT_CORPORATION",
-                ICCPrimaryPlatform.SILICON_GRAPHICS_INC: "SILICON_GRAPHICS_INC",
-                ICCPrimaryPlatform.SUN_MICROSYSTEMS: "SUN_MICROSYSTEMS",
-            }.get(self.primary_platform, None)
-            if primary_platform_str is None:
-                primary_platform_str = repr(self.primary_platform)
-            else:
-                primary_platform_str = f"ICCPrimaryPlatform.{primary_platform_str}"
-            args.append(f"primary_platform={primary_platform_str}")
+            args.append(
+                f"primary_platform={_get_signature_name(ICCPrimaryPlatform, self.primary_platform)}"
+            )
         if self.device_manufacturer != _NULL_SIGNATURE:
             args.append(f"device_manufacturer={self.device_manufacturer!r}")
         if self.device_model != _NULL_SIGNATURE:
@@ -338,16 +300,8 @@ class ICCProfile:
             args.append(f"creator={self.creator!r}")
         if self.id != _NULL_ID:
             args.append(f"id={self.id!r}")
-        rendering_intent_str = {
-            ICCRenderingIntent.PERCEPTUAL: "PERCEPTUAL",
-            ICCRenderingIntent.MEDIA_RELATIVE_COLORIMETRIC: "MEDIA_RELATIVE_COLORIMETRIC",
-            ICCRenderingIntent.SATURATION: "SATURATION",
-            ICCRenderingIntent.ICC_ABSOLUTE_COLORMETRIC: "ICC_ABSOLUTE_COLORMETRIC",
-        }.get(self.rendering_intent, None)
-        if rendering_intent_str is None:
-            rendering_intent_str = repr(self.rendering_intent)
-        else:
-            rendering_intent_str = f"ICCRenderingIntent.{rendering_intent_str}"
-        args.append(f"rendering_intent={rendering_intent_str}")
+        args.append(
+            f"rendering_intent={_get_enum_name(ICCRenderingIntent, self.rendering_intent)}"
+        )
         args.append(f"tagged_elements={self.tagged_elements}")
         return f"ICCProfile({', '.join(args)})"
