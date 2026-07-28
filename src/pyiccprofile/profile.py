@@ -81,13 +81,13 @@ class ICCRenderingIntent:
 class ICCProfile:
     def __init__(
         self,
-        preferred_cmm_type: int,
         profile_class: bytes,
         data_color_space: bytes,
         pcs: bytes,
         creation_time: ICCDateTime,
         rendering_intent: int,
         tagged_elements: list[ICCTaggedElement],
+        preferred_cmm_type: bytes = _NULL_SIGNATURE,
         version: tuple[int, int, int] = _DEFAULT_VERSION,
         primary_platform=_NULL_SIGNATURE,
         flags: int = 0,
@@ -97,6 +97,8 @@ class ICCProfile:
         creator: bytes = _NULL_SIGNATURE,
         id: bytes = _NULL_ID,
     ):
+        if len(preferred_cmm_type) != 4:
+            raise ValueError("preferred_cmm_type must be 4 bytes")
         if len(profile_class) != 4:
             raise ValueError("profile_class must be 4 bytes")
         if len(data_color_space) != 4:
@@ -135,7 +137,7 @@ class ICCProfile:
         profile_size = decode_uint32(data, 0)
         if profile_size != len(data):
             raise ValueError("ICC profile size does not match")
-        preferred_cmm_type = decode_uint32(data, 4)
+        preferred_cmm_type = decode_signature(data, 4)
         version = (data[8], data[9] >> 4, data[9] & 0xF)
         if (data[10], data[11]) != (0, 0):
             raise ValueError("ICC profile reserved bytes are not zero")
@@ -220,7 +222,7 @@ class ICCProfile:
     def encode(self) -> bytes:
         data = bytearray()
         encode_uint32(data, 132)  # FIXME: profile size
-        encode_uint32(data, self.preferred_cmm_type)
+        encode_signature(data, self.preferred_cmm_type)
         data.append(self.version[0])
         data.append(self.version[1] << 4 | self.version[2])
         data.append(0)
@@ -249,7 +251,8 @@ class ICCProfile:
 
     def __repr__(self) -> str:
         args = []
-        args.append(f"preferred_cmm_type={self.preferred_cmm_type}")
+        if self.preferred_cmm_type != _NULL_SIGNATURE:
+            args.append(f"preferred_cmm_type={self.preferred_cmm_type!r}")
         if self.version != _DEFAULT_VERSION:
             args.append(f"version={self.version}")
         profile_class_str = {
