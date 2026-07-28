@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from pyiccprofile.a2b0 import ICCA2B0
+from pyiccprofile.a2b1 import ICCA2B1
+from pyiccprofile.a2b2 import ICCA2B2
 from pyiccprofile.b2a0 import ICCB2A0
 from pyiccprofile.b2a1 import ICCB2A1
 from pyiccprofile.b2a2 import ICCB2A2
@@ -18,9 +21,6 @@ from pyiccprofile.encoder import (
     encode_uint32,
     encode_uint64,
 )
-from pyiccprofile.lut8 import ICCLut8
-from pyiccprofile.lut16 import ICCLut16
-from pyiccprofile.lut_atob import ICCLutAToB
 from pyiccprofile.media_white_point import ICCMediaWhitePoint
 from pyiccprofile.perceptual_rendering_intent_gamut import (
     ICCPerceptualRenderingIntentGamut,
@@ -101,45 +101,6 @@ class ICCDateTime:
 
     def __repr__(self) -> str:
         return f"ICCDateTime({self.year}, {self.month}, {self.day}, {self.hours}, {self.minutes}, {self.seconds})"
-
-
-class ICCA2B0(ICCTaggedElement):
-    def __init__(self, transform: ICCLut8 | ICCLut16 | ICCLutAToB):
-        self.transform = transform
-
-    @classmethod
-    def decode(cls, data: bytes) -> ICCA2B0:
-        transform = ICCLutAToB.decode(data)
-        return cls(transform)
-
-    def __repr__(self) -> str:
-        return f"ICCA2B0({self.transform})"
-
-
-class ICCA2B1(ICCTaggedElement):
-    def __init__(self, transform: ICCLut8 | ICCLut16 | ICCLutAToB):
-        self.transform = transform
-
-    @classmethod
-    def decode(cls, data: bytes) -> ICCA2B1:
-        transform = ICCLutAToB.decode(data)
-        return cls(transform)
-
-    def __repr__(self) -> str:
-        return f"ICCA2B1({self.transform})"
-
-
-class ICCA2B2(ICCTaggedElement):
-    def __init__(self, transform: ICCLut8 | ICCLut16 | ICCLutAToB):
-        self.transform = transform
-
-    @classmethod
-    def decode(cls, data: bytes) -> ICCA2B2:
-        transform = ICCLutAToB.decode(data)
-        return cls(transform)
-
-    def __repr__(self) -> str:
-        return f"ICCA2B2({self.transform})"
 
 
 class ICCProfile:
