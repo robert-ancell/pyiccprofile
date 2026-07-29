@@ -40,7 +40,7 @@ def test_profile_single_tag_round_trip():
     assert len(decoded.tagged_elements) == 1
     tag = decoded.tagged_elements[0]
     assert isinstance(tag, ICCProfileDescription)
-    assert tag.description.records[0].string == "Hello ICC"
+    assert tag.description == [("en", "US", "Hello ICC")]
 
 
 def test_profile_multiple_tags_round_trip():
