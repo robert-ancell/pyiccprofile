@@ -43,6 +43,12 @@ def encode_signature(data: bytearray, signature: bytes) -> None:
     data.extend(signature)
 
 
+def encode_signature_type(data: bytearray, value: bytes) -> None:
+    encode_signature(data, b"sig ")
+    data.extend(b"\x00\x00\x00\x00")
+    encode_signature(data, value)
+
+
 def decode_uint16(data: bytes, offset: int) -> int:
     return int.from_bytes(data[offset : offset + 2], byteorder="big")
 
@@ -111,6 +117,16 @@ def decode_xyz(data: bytes) -> list[tuple[float, float, float]]:
         values.append(decode_xyz_number(data, offset))
         offset += 12
     return values
+
+
+def decode_signature_type(data: bytes) -> bytes:
+    if len(data) != 12:
+        raise ValueError("Invalid length")
+    if decode_signature(data, 0) != b"sig ":
+        raise ValueError("Invalid signature")
+    if data[4:8] != b"\x00\x00\x00\x00":
+        raise ValueError("Reserved field must be 0")
+    return decode_signature(data, 8)
 
 
 class ICCDateTime:
