@@ -18,7 +18,7 @@ See [API documentation](https://robert-ancell.github.io/pyiccprofile) for detail
 
 ## Contributing
 
-PyICCProfile is an open source project with an [LGPL-3.0](LICENSE) license. It is
+PyICCProfile is an open source project with an [MIT](LICENSE) license. It is
 still under active development, and APIs may change between releases.
 Contributions, bug reports, and testing against real-world ICC profiles are
 welcome — see the [project homepage](https://github.com/robert-ancell/pyiccprofile)
