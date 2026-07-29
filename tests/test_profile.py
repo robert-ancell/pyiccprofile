@@ -1,7 +1,3 @@
-from typing import cast
-
-import pytest
-
 from pyiccprofile.chromatic_adaptation import ICCChromaticAdaptation
 from pyiccprofile.codec import ICCDateTime
 from pyiccprofile.copyright import ICCCopyright
