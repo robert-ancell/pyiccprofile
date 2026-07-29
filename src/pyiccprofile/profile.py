@@ -47,7 +47,7 @@ class ICCColorSpace:
     XYZ = b"XYZ "
     LAB = b"Lab "
     CIE_LUV = b"Luv "
-    YCBBCR = b"YCbr"
+    YCBCR = b"YCbr"
     CIE_YXY = b"Yxy "
     RGB = b"RGB "
     GRAY = b"GRAY"
