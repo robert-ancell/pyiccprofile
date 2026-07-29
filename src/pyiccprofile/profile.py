@@ -5,6 +5,7 @@ from __future__ import annotations
 from pyiccprofile.atob0 import ICCAToB0
 from pyiccprofile.atob1 import ICCAToB1
 from pyiccprofile.atob2 import ICCAToB2
+from pyiccprofile.blue_matrix_column import ICCBlueMatrixColumn
 from pyiccprofile.btoa0 import ICCBToA0
 from pyiccprofile.btoa1 import ICCBToA1
 from pyiccprofile.btoa2 import ICCBToA2
@@ -20,11 +21,13 @@ from pyiccprofile.codec import (
 )
 from pyiccprofile.copyright import ICCCopyright
 from pyiccprofile.element import ICCTaggedElement, ICCUnknownTaggedElement
+from pyiccprofile.green_matrix_column import ICCGreenMatrixColumn
 from pyiccprofile.media_white_point import ICCMediaWhitePoint
 from pyiccprofile.perceptual_rendering_intent_gamut import (
     ICCPerceptualRenderingIntentGamut,
 )
 from pyiccprofile.profile_description import ICCProfileDescription
+from pyiccprofile.red_matrix_column import ICCRedMatrixColumn
 
 _DEFAULT_VERSION = (4, 4, 0)
 
@@ -205,6 +208,9 @@ class ICCProfile:
                 ICCCopyright.SIGNATURE: ICCCopyright,
                 ICCChromaticAdaptation.SIGNATURE: ICCChromaticAdaptation,
                 ICCMediaWhitePoint.SIGNATURE: ICCMediaWhitePoint,
+                ICCRedMatrixColumn.SIGNATURE: ICCRedMatrixColumn,
+                ICCGreenMatrixColumn.SIGNATURE: ICCGreenMatrixColumn,
+                ICCBlueMatrixColumn.SIGNATURE: ICCBlueMatrixColumn,
                 ICCPerceptualRenderingIntentGamut.SIGNATURE: ICCPerceptualRenderingIntentGamut,
                 ICCAToB0.SIGNATURE: ICCAToB0,
                 ICCAToB1.SIGNATURE: ICCAToB1,
