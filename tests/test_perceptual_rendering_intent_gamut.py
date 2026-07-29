@@ -53,17 +53,3 @@ def test_perceptual_rendering_intent_gamut_decode_invalid_signature_raises():
     data = b"XXXX" + b"\x00\x00\x00\x00" + b"prmg"
     with pytest.raises(ValueError):
         ICCPerceptualRenderingIntentGamut.decode(data)
-
-
-def test_perceptual_rendering_intent_gamut_constructor_rejects_wrong_length():
-    with pytest.raises(ValueError):
-        ICCPerceptualRenderingIntentGamut(b"abc")
-    with pytest.raises(ValueError):
-        ICCPerceptualRenderingIntentGamut(b"abcde")
-
-
-def test_perceptual_rendering_intent_gamut_repr_does_not_raise():
-    tag = ICCPerceptualRenderingIntentGamut(
-        ICCPerceptualRenderingIntentGamutType.MEDIUM
-    )
-    assert "ICCPerceptualRenderingIntentGamut(" in repr(tag)

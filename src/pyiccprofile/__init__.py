@@ -22,6 +22,7 @@ from pyiccprofile.profile import (
 )
 from pyiccprofile.profile_description import ICCProfileDescription
 from pyiccprofile.red_matrix_column import ICCRedMatrixColumn
+from pyiccprofile.technology import ICCTechnology, ICCTechnologyType
 
 __all__ = [
     "ICCBlueMatrixColumn",
@@ -44,5 +45,7 @@ __all__ = [
     "ICCRedMatrixColumn",
     "ICCRenderingIntent",
     "ICCTaggedElement",
+    "ICCTechnology",
+    "ICCTechnologyType",
     "ICCUnknownTaggedElement",
 ]

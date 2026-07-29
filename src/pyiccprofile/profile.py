@@ -28,6 +28,7 @@ from pyiccprofile.perceptual_rendering_intent_gamut import (
 )
 from pyiccprofile.profile_description import ICCProfileDescription
 from pyiccprofile.red_matrix_column import ICCRedMatrixColumn
+from pyiccprofile.technology import ICCTechnology
 
 _DEFAULT_VERSION = (4, 4, 0)
 
@@ -206,6 +207,7 @@ class ICCProfile:
             tag_class: type[ICCTaggedElement] | None = {
                 ICCProfileDescription.SIGNATURE: ICCProfileDescription,
                 ICCCopyright.SIGNATURE: ICCCopyright,
+                ICCTechnology.SIGNATURE: ICCTechnology,
                 ICCChromaticAdaptation.SIGNATURE: ICCChromaticAdaptation,
                 ICCMediaWhitePoint.SIGNATURE: ICCMediaWhitePoint,
                 ICCRedMatrixColumn.SIGNATURE: ICCRedMatrixColumn,

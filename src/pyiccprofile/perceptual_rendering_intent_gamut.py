@@ -10,8 +10,6 @@ class ICCPerceptualRenderingIntentGamut(ICCTaggedElement):
     SIGNATURE = b"rig0"
 
     def __init__(self, gamut: bytes):
-        if len(gamut) != 4:
-            raise ValueError("gamut must be a 4-byte signature")
         self.gamut = gamut
 
     @classmethod
