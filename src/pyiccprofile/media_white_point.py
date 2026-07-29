@@ -17,5 +17,8 @@ class ICCMediaWhitePoint(ICCTaggedElement):
     def encode(self, data: bytearray) -> None:
         encode_xyz(data, self.colors)
 
+    def __eq__(self, other):
+        return isinstance(other, ICCMediaWhitePoint) and other.colors == self.colors
+
     def __repr__(self) -> str:
         return f"ICCMediaWhitePoint({self.colors})"

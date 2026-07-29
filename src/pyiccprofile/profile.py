@@ -241,8 +241,33 @@ class ICCProfile:
         )
 
     def encode(self) -> bytes:
+        tag_table_length = 4 + 12 * len(self.tagged_elements)
+        data_start = 128 + tag_table_length
+
+        tag_table = bytearray()
+        encode_uint32(tag_table, len(self.tagged_elements))
+        tag_data = bytearray()
+        offset = data_start
+        for element in self.tagged_elements:
+            if isinstance(element, ICCUnknownTaggedElement):
+                tag_signature = element.signature
+            else:
+                tag_signature = type(element).SIGNATURE
+            body = bytearray()
+            element.encode(body)
+            length = len(body)
+            encode_signature(tag_table, tag_signature)
+            encode_uint32(tag_table, offset)
+            encode_uint32(tag_table, length)
+            tag_data.extend(body)
+            padding = (-length) % 4
+            tag_data.extend(b"\x00" * padding)
+            offset += length + padding
+
+        total_size = data_start + len(tag_data)
+
         data = bytearray()
-        encode_uint32(data, 132)  # FIXME: profile size
+        encode_uint32(data, total_size)
         encode_signature(data, self.preferred_cmm_type)
         data.append(self.version[0])
         data.append(self.version[1] << 4 | self.version[2])
@@ -266,8 +291,8 @@ class ICCProfile:
         data.extend(self.id)
         for _ in range(28):
             data.append(0)
-        # FIXME: tags
-        encode_uint32(data, 0)
+        data.extend(tag_table)
+        data.extend(tag_data)
         return bytes(data)
 
     def __repr__(self) -> str:

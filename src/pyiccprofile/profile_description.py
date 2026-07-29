@@ -16,5 +16,11 @@ class ICCProfileDescription(ICCTaggedElement):
     def encode(self, data: bytearray) -> None:
         self.description.encode(data)
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, ICCProfileDescription)
+            and other.description == self.description
+        )
+
     def __repr__(self) -> str:
         return f"ICCProfileDescription({self.description})"

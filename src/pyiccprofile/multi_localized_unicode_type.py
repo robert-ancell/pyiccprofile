@@ -16,6 +16,14 @@ class ICCMultiLocalizedUnicodeTypeRecord:
         self.country_code = country_code
         self.string = string
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, ICCMultiLocalizedUnicodeTypeRecord)
+            and other.language_code == self.language_code
+            and other.country_code == self.country_code
+            and other.string == self.string
+        )
+
     def __repr__(self) -> str:
         return f"ICCMultiLocalizedUnicodeTypeRecord({self.language_code!r}, {self.country_code!r}, {self.string!r})"
 
@@ -80,6 +88,12 @@ class ICCMultiLocalizedUnicodeType:
             string_offset += string_length
         for record in self.records:
             data.extend(record.string.encode("utf-16-be"))
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, ICCMultiLocalizedUnicodeType)
+            and other.records == self.records
+        )
 
     def __repr__(self) -> str:
         return f"ICCMultiLocalizedUnicodeType({self.records})"

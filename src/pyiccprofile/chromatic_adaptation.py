@@ -18,5 +18,8 @@ class ICCChromaticAdaptation(ICCTaggedElement):
     def encode(self, data: bytearray) -> None:
         encode_s15fixed16_array(data, self.matrix)
 
+    def __eq__(self, other):
+        return isinstance(other, ICCChromaticAdaptation) and other.matrix == self.matrix
+
     def __repr__(self) -> str:
         return f"ICCChromaticAdaptation({self.matrix})"
