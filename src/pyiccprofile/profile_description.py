@@ -1,20 +1,23 @@
+from pyiccprofile.codec import (
+    decode_multi_localized_unicode_type,
+    encode_multi_localized_unicode_type,
+)
 from pyiccprofile.element import ICCTaggedElement
-from pyiccprofile.multi_localized_unicode_type import ICCMultiLocalizedUnicodeType
 
 
 class ICCProfileDescription(ICCTaggedElement):
     SIGNATURE = b"desc"
 
-    def __init__(self, description: ICCMultiLocalizedUnicodeType):
+    def __init__(self, description: list[tuple[str, str, str]]):
         self.description = description
 
     @classmethod
     def decode(cls, data: bytes) -> "ICCProfileDescription":
-        description = ICCMultiLocalizedUnicodeType.decode(data)
+        description = decode_multi_localized_unicode_type(data)
         return cls(description)
 
     def encode(self, data: bytearray) -> None:
-        self.description.encode(data)
+        encode_multi_localized_unicode_type(data, self.description)
 
     def __eq__(self, other):
         return (

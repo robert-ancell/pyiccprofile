@@ -2,10 +2,6 @@ from pyiccprofile.chromatic_adaptation import ICCChromaticAdaptation
 from pyiccprofile.codec import ICCDateTime
 from pyiccprofile.copyright import ICCCopyright
 from pyiccprofile.element import ICCTaggedElement, ICCUnknownTaggedElement
-from pyiccprofile.multi_localized_unicode_type import (
-    ICCMultiLocalizedUnicodeType,
-    ICCMultiLocalizedUnicodeTypeRecord,
-)
 from pyiccprofile.profile import ICCColorSpace, ICCProfile, ICCProfileClass
 from pyiccprofile.profile_description import ICCProfileDescription
 
@@ -22,19 +18,11 @@ def _base_profile(tagged_elements: list[ICCTaggedElement]):
 
 
 def _description(text: str):
-    return ICCProfileDescription(
-        ICCMultiLocalizedUnicodeType(
-            [ICCMultiLocalizedUnicodeTypeRecord("en", "US", text)]
-        )
-    )
+    return ICCProfileDescription([("en", "US", text)])
 
 
 def _copyright(copyright: str):
-    return ICCCopyright(
-        ICCMultiLocalizedUnicodeType(
-            [ICCMultiLocalizedUnicodeTypeRecord("en", "US", copyright)]
-        )
-    )
+    return ICCCopyright([("en", "US", copyright)])
 
 
 def test_profile_no_tags_round_trip():

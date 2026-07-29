@@ -49,6 +49,25 @@ def encode_signature_type(data: bytearray, value: bytes) -> None:
     encode_signature(data, value)
 
 
+def encode_multi_localized_unicode_type(
+    data: bytearray, value: list[tuple[str, str, str]]
+) -> None:
+    encode_signature(data, b"mluc")
+    data.extend(b"\x00\x00\x00\x00")
+    encode_uint32(data, len(value))
+    encode_uint32(data, 12)
+    string_offset = 16 + len(value) * 12
+    for language_code, country_code, string in value:
+        data.extend(language_code.encode("ascii"))
+        data.extend(country_code.encode("ascii"))
+        string_length = len(string.encode("utf-16-be"))
+        encode_uint32(data, string_length)
+        encode_uint32(data, string_offset)
+        string_offset += string_length
+    for _, _, string in value:
+        data.extend(string.encode("utf-16-be"))
+
+
 def decode_uint16(data: bytes, offset: int) -> int:
     return int.from_bytes(data[offset : offset + 2], byteorder="big")
 
@@ -127,6 +146,39 @@ def decode_signature_type(data: bytes) -> bytes:
     if data[4:8] != b"\x00\x00\x00\x00":
         raise ValueError("Reserved field must be 0")
     return decode_signature(data, 8)
+
+
+def decode_multi_localized_unicode_type(data: bytes) -> list[tuple[str, str, str]]:
+    if len(data) < 16:
+        raise ValueError("Invalid length multi-localized unicode type")
+
+    signature = decode_signature(data, 0)
+    if signature != b"mluc":
+        raise ValueError("Invalid signature for multi-localized unicode type")
+    reserved = decode_uint32(data, 4)
+    if reserved != 0:
+        raise ValueError("Reserved field must be 0")
+    n_records = decode_uint32(data, 8)
+    record_length = decode_uint32(data, 12)
+    if record_length < 12:
+        raise ValueError("Invalid record length")
+    character_start = 16 + n_records * record_length
+    if character_start > len(data):
+        raise ValueError("Insufficient data for records")
+    record_offset = 16
+    records = []
+    for _ in range(n_records):
+        language_code = data[record_offset : record_offset + 2].decode("ascii")
+        country_code = data[record_offset + 2 : record_offset + 4].decode("ascii")
+        string_length = decode_uint32(data, record_offset + 4)
+        string_offset = decode_uint32(data, record_offset + 8)
+        if string_offset < character_start or string_offset + string_length > len(data):
+            raise ValueError("Invalid string offset")
+        string = data[string_offset : string_offset + string_length].decode("utf-16-be")
+        records.append((language_code, country_code, string))
+        record_offset += record_length
+
+    return records
 
 
 class ICCDateTime:

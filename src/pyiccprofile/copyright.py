@@ -1,20 +1,23 @@
+from pyiccprofile.codec import (
+    decode_multi_localized_unicode_type,
+    encode_multi_localized_unicode_type,
+)
 from pyiccprofile.element import ICCTaggedElement
-from pyiccprofile.multi_localized_unicode_type import ICCMultiLocalizedUnicodeType
 
 
 class ICCCopyright(ICCTaggedElement):
     SIGNATURE = b"cprt"
 
-    def __init__(self, copyright: ICCMultiLocalizedUnicodeType):
+    def __init__(self, copyright: list[tuple[str, str, str]]):
         self.copyright = copyright
 
     @classmethod
     def decode(cls, data: bytes) -> "ICCCopyright":
-        copyright = ICCMultiLocalizedUnicodeType.decode(data)
+        copyright = decode_multi_localized_unicode_type(data)
         return cls(copyright)
 
     def encode(self, data: bytearray) -> None:
-        self.copyright.encode(data)
+        encode_multi_localized_unicode_type(data, self.copyright)
 
     def __eq__(self, other):
         return isinstance(other, ICCCopyright) and other.copyright == self.copyright

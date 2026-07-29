@@ -9,7 +9,6 @@ from pyiccprofile.lut16 import ICCLut16
 from pyiccprofile.lut_atob import ICCLutAToB
 from pyiccprofile.lut_btoa import ICCLutBToA
 from pyiccprofile.media_white_point import ICCMediaWhitePoint
-from pyiccprofile.multi_localized_unicode_type import ICCMultiLocalizedUnicodeType
 from pyiccprofile.perceptual_rendering_intent_gamut import (
     ICCPerceptualRenderingIntentGamut,
 )
@@ -36,7 +35,6 @@ __all__ = [
     "ICCLutAToB",
     "ICCLutBToA",
     "ICCMediaWhitePoint",
-    "ICCMultiLocalizedUnicodeType",
     "ICCPerceptualRenderingIntentGamut",
     "ICCPrimaryPlatform",
     "ICCProfile",
