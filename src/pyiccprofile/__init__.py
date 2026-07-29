@@ -1,7 +1,9 @@
+from pyiccprofile.blue_matrix_column import ICCBlueMatrixColumn
 from pyiccprofile.chromatic_adaptation import ICCChromaticAdaptation
 from pyiccprofile.codec import ICCDateTime
 from pyiccprofile.copyright import ICCCopyright
 from pyiccprofile.element import ICCTaggedElement, ICCUnknownTaggedElement
+from pyiccprofile.green_matrix_column import ICCGreenMatrixColumn
 from pyiccprofile.lut8 import ICCLut8
 from pyiccprofile.lut16 import ICCLut16
 from pyiccprofile.lut_atob import ICCLutAToB
@@ -19,12 +21,15 @@ from pyiccprofile.profile import (
     ICCRenderingIntent,
 )
 from pyiccprofile.profile_description import ICCProfileDescription
+from pyiccprofile.red_matrix_column import ICCRedMatrixColumn
 
 __all__ = [
+    "ICCBlueMatrixColumn",
     "ICCChromaticAdaptation",
     "ICCColorSpace",
     "ICCCopyright",
     "ICCDateTime",
+    "ICCGreenMatrixColumn",
     "ICCLut8",
     "ICCLut16",
     "ICCLutAToB",
@@ -36,6 +41,7 @@ __all__ = [
     "ICCProfile",
     "ICCProfileClass",
     "ICCProfileDescription",
+    "ICCRedMatrixColumn",
     "ICCRenderingIntent",
     "ICCTaggedElement",
     "ICCUnknownTaggedElement",
